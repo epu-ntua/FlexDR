@@ -1,0 +1,7 @@
+__pycache__/
+*.csv
+*.env*
+*.pkl
+/app/models/recommendations.py
+/app/routers/mlflow.py
+*.coverage

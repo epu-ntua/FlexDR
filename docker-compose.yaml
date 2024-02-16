@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    expose:
+      - '27017'
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+      MONGO_TEST_DB: ${MONGO_TEST_DB}
+    volumes:
+      - mongodb:/data/db
+      - ./app/scripts:/scripts
+
+  app:
+    build: .
+    container_name: flexibility-backend
+    restart: always
+    environment:
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASS: ${MONGO_PASS}
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_TEST_DB: ${MONGO_TEST_DB}
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mongo
+    volumes:
+      - ./app:/code/app
+#   command: uvicorn src.main:app --reload --workers 1 --host
+
+volumes:
+  mongodb:

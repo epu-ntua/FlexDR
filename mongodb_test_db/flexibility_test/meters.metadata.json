@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"device_id":{"$numberInt":"1"}},"name":"device_id_1","unique":true}],"uuid":"64392244cb554235a8d8e089043b14e4","collectionName":"meters","type":"collection"}
