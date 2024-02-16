@@ -8,8 +8,8 @@ from .ml_models import Cluster, MLModelRes
 
 class Recommendation(BaseModel):
     name: Optional[constr(strip_whitespace=True, max_length=50)] = Field(default="")
-    description: Optional[constr(strip_whitespace=True, max_length=100)] = Field(default="")
-    details: Optional[constr(strip_whitespace=True, max_length=500)] = Field(default="")
+    description: Optional[constr(strip_whitespace=True, max_length=200)] = Field(default="")
+    details: Optional[constr(strip_whitespace=True, max_length=900)] = Field(default="")
 
 
 # used for cluster profile creation
