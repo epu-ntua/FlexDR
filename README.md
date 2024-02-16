@@ -2,8 +2,8 @@
 ## Repository information
 This is the repository of FlexDR backend application developed within I-NERGY UC7 project.\
 FlexDR service consists of additional services which can be found using the following urls:
-* FlexDR Front-end repository []()
-* FlexDR Orchestration engine []()
+* FlexDR Front-end repository [I-NERGY FlexDR frontend repository](https://github.com/I-NERGY/FlexDR_frontend)
+* FlexDR Orchestration engine [I-NERGY FlexDR orchestration engine repository](https://github.com/I-NERGY/dagster-orchestrator)
 
 ## Deployment guidelines
 This section provides instructions to deploy FlexDR FastAPI service and MongoDB locally in docker containers, using Docker Compose.
