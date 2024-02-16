@@ -14,7 +14,7 @@ class ClusterProfile(BaseModel):
     cluster: List[Cluster]
     name: constr(strip_whitespace=True, min_length=1, max_length=50)
     short_description: constr(strip_whitespace=True, min_length=1, max_length=300)
-    long_description: constr(strip_whitespace=True, min_length=1, max_length=500)
+    long_description: constr(strip_whitespace=True, min_length=1, max_length=900)
     recommendation: Recommendation
 
 
