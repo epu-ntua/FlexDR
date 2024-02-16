@@ -30,7 +30,7 @@ class ClusterProfileUpdate(BaseModel):
     selected_clusters: Optional[List[int]]
     name: constr(strip_whitespace=True, min_length=1, max_length=50)
     short_description: Optional[constr(strip_whitespace=True, min_length=1, max_length=300)]
-    long_description: Optional[constr(strip_whitespace=True, min_length=1, max_length=500)]
+    long_description: Optional[constr(strip_whitespace=True, min_length=1, max_length=900)]
     recommendation: Optional[Recommendation]
 
     def to_dict(self):
@@ -47,7 +47,7 @@ class ClusterProfileRes(BaseModel):
     clusters: List[Cluster]
     name: constr(strip_whitespace=True, min_length=1, max_length=50)
     short_description: constr(strip_whitespace=True, min_length=1, max_length=300)
-    long_description: constr(strip_whitespace=True, min_length=1, max_length=500)
+    long_description: constr(strip_whitespace=True, min_length=1, max_length=900)
     recommendation: Recommendation
 
     class Config:
