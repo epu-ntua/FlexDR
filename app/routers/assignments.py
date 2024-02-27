@@ -6,13 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from app.models.common import PyObjectId
 from app.models.assignments import Assignment, AssignmentRes, AssignmentDetailedRes, AssignmentUpdate
 from fastapi.encoders import jsonable_encoder
+from app.auth.auth import has_access_to_admin_routes, has_access_to_prosumer_routes, get_userinfo
 
 # from ..dependencies import get_token_header
 
 router = APIRouter(
     prefix="/assignments",
     tags=["assignments"],
-    # dependencies=[Depends(get_token_header)],
+    # dependencies=[Depends(has_access_to_admin_routes)],
     responses={404: {"description": "Not found"}},
 )
 
@@ -103,9 +104,44 @@ def create_assignment(request: Request, assignment: Assignment = Body(...), ):
         raise HTTPException(status_code=400, detail='Invalid ID')
 
 
+@router.get("/daily", response_model=List[AssignmentDetailedRes],
+            response_model_by_alias=False)
+def get_daily_assignment(request: Request, valid: bool = Depends(has_access_to_prosumer_routes),
+                         userinfo=Depends(get_userinfo)):
+    try:
+        device_id = userinfo.get('smart_meter_id')
+        ml_models = request.app.db['ml_models'].find({"production": "True"})
+        ml_models_list = list(ml_models)
+        if len(ml_models_list) != 1:
+            raise HTTPException(status_code=500)
+        ml_model_id = ml_models_list[0].get('_id')
+
+        current_date = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # Construct the query for current date
+        query = {
+            "ml_model._id": ml_model_id,
+            "meter.device_id": device_id,
+            "forecast_datetime": {
+                "$gte": current_date,
+                "$lt": current_date + datetime.timedelta(days=2)
+            }
+        }
+        results = request.app.db["assignments"].find(query)
+        assignments = list(results)
+        if len(assignments) > 2:
+            raise HTTPException(status_code=409, detail='More than two day ahead assignments for this meter.')
+
+        return [] if len(assignments) == 0 else assignments
+    except bson.errors.InvalidId:
+        raise HTTPException(status_code=400, detail='Invalid ID')
+    except pymongo.errors.PyMongoError:
+        raise HTTPException(status_code=500)
+
+
 @router.get("", response_model=List[AssignmentDetailedRes],
             response_model_by_alias=False)
-def get_all_assignments(request: Request):
+def get_all_assignments(request: Request, valid: bool = Depends(has_access_to_admin_routes)):
     try:
         results = request.app.db["assignments"].find()
         assignments = list(results)
@@ -115,7 +151,8 @@ def get_all_assignments(request: Request):
 
 
 @router.put("/edit/{assignment_id}", response_model=AssignmentDetailedRes, response_model_by_alias=False)
-def edit_assignment(request: Request, assignment_id, assignment: AssignmentUpdate = Body(...), ):
+def edit_assignment(request: Request, assignment_id, assignment: AssignmentUpdate = Body(...),
+                    valid: bool = Depends(has_access_to_admin_routes)):
     try:
         asid = PyObjectId(assignment_id)
         recommendation = assignment.recommendation
@@ -134,7 +171,7 @@ def edit_assignment(request: Request, assignment_id, assignment: AssignmentUpdat
 
 @router.get("/meter/{meter_id}", response_model=List[AssignmentDetailedRes],
             response_model_by_alias=False)
-def get_meter_assignments(request: Request, meter_id: str):
+def get_meter_assignments(request: Request, meter_id: str, valid: bool = Depends(has_access_to_admin_routes)):
     try:
         meter_id = PyObjectId(meter_id)
         ml_models = request.app.db['ml_models'].find({"production": "True"})
@@ -166,10 +203,9 @@ def get_meter_assignments(request: Request, meter_id: str):
         raise HTTPException(status_code=500)
 
 
-
 @router.get("/{meter_id}/{ml_model_id}", response_model=Union[AssignmentDetailedRes, None],
             response_model_by_alias=False)
-def get_day_ahead_assignments(request: Request, meter_id: str, ml_model_id: str):
+def get_day_ahead_assignments(request: Request, meter_id: str, ml_model_id: str, valid: bool = Depends(has_access_to_admin_routes)):
     try:
         meter_id = PyObjectId(meter_id)
         ml_model_id = PyObjectId(ml_model_id)
@@ -198,7 +234,7 @@ def get_day_ahead_assignments(request: Request, meter_id: str, ml_model_id: str)
 
 
 @router.get("/{assignment_id}", response_model=Union[AssignmentDetailedRes, None], response_model_by_alias=False)
-def get_assignment_by_id(request: Request, assignment_id: str):
+def get_assignment_by_id(request: Request, assignment_id: str, valid: bool = Depends(has_access_to_admin_routes)):
     try:
         asid = PyObjectId(assignment_id)
         assignment = request.app.db["assignments"].find_one({"_id": asid})

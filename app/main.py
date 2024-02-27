@@ -2,10 +2,11 @@ import os
 from contextlib import asynccontextmanager
 import uvicorn
 from pymongo.database import Database
-from fastapi import FastAPI, Body, Depends, Request, HTTPException
+from fastapi import FastAPI, Depends
 from pymongo import MongoClient
 from starlette.middleware.cors import CORSMiddleware
 from app.routers import cluster_profiles, ml_models, meters, assignments
+from auth.auth import has_access_to_admin_routes
 
 MONGO_USER = os.getenv('MONGO_USER')
 MONGO_PASS = os.getenv('MONGO_PASS')
@@ -40,7 +41,7 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root():
+async def root(valid: bool = Depends(has_access_to_admin_routes)):
     return {"message": "Welcome to FlexDR"}
 
 

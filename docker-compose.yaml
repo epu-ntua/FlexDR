@@ -28,6 +28,12 @@ services:
       MONGO_HOST: ${MONGO_HOST}
       MONGO_PORT: ${MONGO_PORT}
       MONGO_TEST_DB: ${MONGO_TEST_DB}
+      APP_NAME : ${APP_NAME}
+      ADMIN_ROLES : ${ADMIN_ROLES}
+      USER_ROLES : ${USER_ROLES}
+      KEYCLOAK_URL : ${KEYCLOAK_URL}
+      CLIENT_ID : ${CLIENT_ID}
+      CLIENT_SECRET : ${CLIENT_SECRET}
     ports:
       - "8002:8002"
     depends_on:

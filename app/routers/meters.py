@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from app.models.meters import Meter, MeterRes, MeterUpdate
 from app.models.common import PyObjectId
 from fastapi.encoders import jsonable_encoder
-
+from app.auth.auth import has_access_to_admin_routes
 # from ..dependencies import get_token_header
 
 router = APIRouter(
     prefix="/meters",
     tags=["smart meters"],
-    # dependencies=[Depends(get_token_header)],
+    dependencies=[Depends(has_access_to_admin_routes)],
     responses={404: {"description": "Not found"}},
 )
 

@@ -1,17 +1,17 @@
 from typing import List, Union, Dict
 import pymongo
-from fastapi import APIRouter, Request, HTTPException, Body
+from fastapi import APIRouter, Request, HTTPException, Body, Depends
 import bson
 from fastapi.encoders import jsonable_encoder
 from app.models.ml_models import MLModel, MLModelRes
 from app.models.common import PyObjectId
-
+from app.auth.auth import has_access_to_admin_routes
 # from ..dependencies import get_token_header
 
 router = APIRouter(
     prefix="/models",
     tags=["ml_models"],
-    # dependencies=[Depends(get_token_header)],
+    dependencies=[Depends(has_access_to_admin_routes)],
     responses={404: {"description": "Not found"}},
 )
 

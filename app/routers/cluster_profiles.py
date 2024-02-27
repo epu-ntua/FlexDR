@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.models.common import PyObjectId
 from app.models.cluster_profiles import ClusterProfile, ClusterProfileRes, ClusterProfileUpdate
 from .dependencies import fetch_cluster_profiles
-
+from app.auth.auth import has_access_to_admin_routes
 
 def find_matching(selected, all):
     matching_clusters = []
@@ -23,7 +23,7 @@ def find_matching(selected, all):
 router = APIRouter(
     prefix="/cluster-profiles",
     tags=["cluster-profiles"],
-    # dependencies=[Depends(get_token_header)],
+    dependencies=[Depends(has_access_to_admin_routes)],
     responses={404: {"description": "Not found"}},
 )
 
